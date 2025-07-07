@@ -4,17 +4,17 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
-const whiteList = ['/user/login', '/user/register'];
+// const whiteList = ['/user/login', '/user/register'];
 
-function middleWareAll(req, res, next) {
-  console.log(req.originalUrl, '我收全局的');
+// function middleWareAll(req, res, next) {
+//   console.log(req.originalUrl, '我收全局的');
 
-  if (whiteList.includes(req.originalUrl)) {
-    next();
-  } else {
-    res.status(500).send({ code: 500 });
-  }
-}
+//   if (whiteList.includes(req.originalUrl)) {
+//     next();
+//   } else {
+//     res.status(500).send({ code: 500 });
+//   }
+// }
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
