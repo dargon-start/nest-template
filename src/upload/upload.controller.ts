@@ -52,7 +52,7 @@ export class UploadController {
     @Res({ passthrough: true }) response,
   ): Promise<void> {
     const archive = archiver('zip', {
-      zlib: { level: 9 },
+      zlib: { level: 6 },
     });
 
     response.setHeader(
