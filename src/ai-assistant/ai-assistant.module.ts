@@ -1,12 +1,9 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AiAssistantController } from './ai-assistant.controller';
 import { AiAssistantService } from './ai-assistant.service';
-import { Conversation } from './conversation.entity';
+import { AiAssistantController } from './ai-assistant.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Conversation])],
-  controllers: [AiAssistantController],
   providers: [AiAssistantService],
+  controllers: [AiAssistantController],
 })
 export class AiAssistantModule {}

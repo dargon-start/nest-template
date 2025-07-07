@@ -96,3 +96,43 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+## AI 对话接口模块（ai-assistant）
+
+### 功能说明
+- 提供AI对话接口，支持与AI进行多轮对话。
+- 自动保存每次对话的历史记录，支持按会话ID查询历史。
+
+### 用途
+- 可用于客服机器人、智能问答、对话式交互等场景。
+
+### 使用方法
+1. 启动服务后，访问 `/ai-assistant/conversation` 相关接口。
+2. 通过POST请求发送用户消息，获取AI回复。
+3. 可通过会话ID获取历史对话。
+
+### 主要接口
+- `POST /ai-assistant/conversation`
+  - 发送用户消息，获取AI回复，并保存本轮对话。
+  - 请求参数：
+    - `sessionId` (string, 可选)：会话ID，不传则新建会话。
+    - `message` (string, 必填)：用户输入内容。
+  - 返回值：
+    - `sessionId` (string)：本次会话ID。
+    - `reply` (string)：AI回复内容。
+    - `history` (array)：当前会话历史对话（含本轮）。
+
+- `GET /ai-assistant/conversation/:sessionId`
+  - 获取指定会话ID的全部历史对话。
+  - 返回值：
+    - `sessionId` (string)：会话ID。
+    - `history` (array)：该会话全部历史对话。
+
+### 历史对话保存方式
+- 使用TypeORM实体`Conversation`，保存每条对话（含会话ID、角色、内容、时间戳等）。
+- 支持多会话并行，历史可追溯。
+
+### 依赖
+- NestJS
+- TypeORM
+- 可选：OpenAI/自定义AI服务

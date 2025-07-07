@@ -1,20 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AiAssistantModule } from './ai-assistant/ai-assistant.module';
+// import { AiAssistantModule } from './ai-assistant/ai-assistant.module'; // AI对话模块
+import { UserModule } from './user/user.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mongodb',
-      url: process.env.MONGODB_URI || 'mongodb://localhost:27017/nest_template',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
-    }),
-    AiAssistantModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+    // AiAssistantModule,
+    UserModule,
+    UploadModule,
+  ], // 集成TypeORM和AI对话模块
 })
 export class AppModule {}

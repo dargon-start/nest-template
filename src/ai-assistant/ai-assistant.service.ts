@@ -1,63 +1,78 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import OpenAI from 'openai';
-
-import { Conversation } from './conversation.entity';
-import { ChatCompletionMessageParam } from 'openai/resources/index';
+import { PrismaClient } from '@prisma/client';
+import { CreateConversationDto } from './dto/create-conversation.dto';
+import { v4 as uuidv4 } from 'uuid';
+import { ChatOpenAI } from '@langchain/openai';
 
 @Injectable()
 export class AiAssistantService {
-  constructor(
-    @InjectRepository(Conversation)
-    private conversationRepository: Repository<Conversation>,
-  ) {}
+  private prisma = new PrismaClient();
 
-  askQuestion(
-    userId: string,
-    question: ChatCompletionMessageParam[],
-  ): ReadableStream<string> {
-    const openai = new OpenAI({
-      // 若没有配置环境变量，请用百炼API Key将下行替换为：apiKey: "sk-xxx",
-      apiKey: 'sk-fde9b160bdc348e3a648c853fb589033',
-      baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-    });
+  constructor() {
+    if (!process.env.QWEN_API_KEY) {
+      throw new Error('QWEN_API_KEY 未在环境变量中配置');
+    }
+  }
 
-    const stream = new ReadableStream<string>({
-      // 当有消费者开始读取流时，start 会被自动调用
-      async start(controller) {
-        const completion = await openai.chat.completions.create({
-          model: 'qwen-plus-2025-04-28',
-          messages: question,
-          stream: true,
-          stream_options: {
-            include_usage: true,
-          },
-        });
-
-        for await (const chunk of completion) {
-          if (Array.isArray(chunk.choices) && chunk.choices.length > 0) {
-            // const content = chunk.choices[0].delta.content;
-            // if (content !== null && content !== undefined) {
-            //   // 将每次生成的内容片段推送到流中，供调用方实时消费
-            // }
-            controller.enqueue(JSON.stringify(chunk));
-          }
-        }
-        controller.close();
+  async createMessage(_dto: unknown) {
+    const dto = _dto as CreateConversationDto;
+    const sessionId = dto.sessionId || (uuidv4 as () => string)();
+    // 保存用户消息
+    await this.prisma.conversation.create({
+      data: {
+        sessionId,
+        role: 'user',
+        content:
+          dto &&
+          typeof dto === 'object' &&
+          'message' in dto &&
+          typeof dto.message === 'string'
+            ? dto.message
+            : '',
       },
     });
 
-    console.log('question', stream);
+    // 使用langchain调用qwen-plus-2025-04-28大模型
+    const llm = new ChatOpenAI({
+      openAIApiKey: process.env.QWEN_API_KEY, // 请在环境变量中配置QWEN_API_KEY
+      modelName: 'qwen-plus-2025-04-28',
+      temperature: 0.7,
+    });
+    const aiReply = await llm.call([{ role: 'user', content: dto.message }]);
 
-    return stream;
+    // 确保aiReply.content是字符串类型
+    const aiContent =
+      typeof aiReply.content === 'string'
+        ? aiReply.content
+        : JSON.stringify(aiReply.content);
+
+    await this.prisma.conversation.create({
+      data: {
+        sessionId,
+        role: 'assistant',
+        content: aiContent,
+      },
+    });
+    // 查询历史
+    const history = await this.prisma.conversation.findMany({
+      where: { sessionId },
+      orderBy: { timestamp: 'asc' },
+    });
+    return {
+      sessionId,
+      reply: aiContent,
+      history,
+    };
   }
 
-  async getConversationHistory(userId: string): Promise<Conversation[]> {
-    return this.conversationRepository.find({
-      where: { userId },
-      order: { createdAt: 'DESC' },
-      take: 10, // 获取最近的10条对话记录
+  async getHistory(sessionId: string) {
+    const history = await this.prisma.conversation.findMany({
+      where: { sessionId },
+      orderBy: { timestamp: 'asc' },
     });
+    return {
+      sessionId,
+      history,
+    };
   }
 }
