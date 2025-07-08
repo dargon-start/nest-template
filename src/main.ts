@@ -1,8 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+
+import { AppModule } from './app.module';
+import { ResponseInterceptor } from './common/response';
+import { HttpFilter } from './common/filter';
 
 // const whiteList = ['/user/login', '/user/register'];
 
@@ -21,6 +24,9 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, 'images'), {
     prefix: '/lz',
   });
+
+  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalFilters(new HttpFilter());
 
   // 添加全局验证管道
   app.useGlobalPipes(
