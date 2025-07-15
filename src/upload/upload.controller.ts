@@ -14,8 +14,10 @@ import { join } from 'path';
 import archiver from 'archiver';
 import { UploadService } from './upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('upload')
+@ApiTags('附件')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 

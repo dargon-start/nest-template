@@ -6,6 +6,7 @@ import { join } from 'path';
 import { AppModule } from './app.module';
 import { ResponseInterceptor } from './common/response';
 import { HttpFilter } from './common/filter';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 // const whiteList = ['/user/login', '/user/register'];
 
@@ -24,6 +25,8 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, 'images'), {
     prefix: '/lz',
   });
+
+  // app.useGlobalGuards(new RoleGuard());
 
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalFilters(new HttpFilter());
@@ -47,6 +50,15 @@ async function bootstrap() {
   // 设置允许跨域请求（如果需要）
   app.enableCors();
   // app.use(middleWareAll);
+
+  const options = new DocumentBuilder()
+    .addBearerAuth()
+    .setTitle('lz接口文档')
+    .setDescription('描述，。。。')
+    .setVersion('1')
+    .build();
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('/api-docs', app, document);
 
   await app.listen(process.env.PORT ?? 3000);
 }
