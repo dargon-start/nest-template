@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -14,10 +13,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Conversation {
-  id        String   @id @default(uuid())
-  sessionId String
-  role      String
-  content   String
-  timestamp DateTime @default(now())
+model ErrorList {
+  id        Int     @id @default(autoincrement())
+  errorName String  @map("error_name")
+  errorType String  @map("error_type")
+  createTime DateTime? @default(now()) @map("create_time")
+
+  @@map("error_list")
 }
