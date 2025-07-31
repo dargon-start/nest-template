@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ErrorReportController } from './error-report.controller';
 import { ErrorReportService } from './error-report.service';
-import { ErrorList } from './entities/error-list.entity';
+import { MonitorEvent } from './entities/monitor-event.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ErrorList])],
+  imports: [TypeOrmModule.forFeature([MonitorEvent])],
   controllers: [ErrorReportController],
   providers: [ErrorReportService],
 })
