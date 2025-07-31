@@ -20,11 +20,11 @@ export class ErrorReportController {
       new ValidationPipe({
         transform: true,
         whitelist: true,
-        transformOptions: { enableImplicitConversion: true },
       }),
     )
     createErrorReportDto: CreateErrorReportDto,
   ) {
+    // 中间件已经将 text/plain 内容转换为 JSON，ValidationPipe 会验证转换后的数据
     return this.errorReportService.create(createErrorReportDto);
   }
 

@@ -42,8 +42,8 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
+      // whitelist: true,
+      // forbidNonWhitelisted: true,
       transformOptions: { enableImplicitConversion: true },
       // 确保会抛出完整的验证错误
       exceptionFactory: (errors) => {

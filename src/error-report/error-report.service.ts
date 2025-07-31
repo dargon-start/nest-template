@@ -25,10 +25,6 @@ export class ErrorReportService {
 
   async create(createErrorReportDto: CreateErrorReportDto) {
     try {
-      this.logger.log(
-        `接收到事件上报: ${JSON.stringify(createErrorReportDto)}`,
-      );
-
       // 获取客户端IP
       const ip = this.getClientIp();
 
