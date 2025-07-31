@@ -34,9 +34,7 @@ export class CreateErrorReportDto {
   sessionId: string;
 
   @ApiProperty({ description: '事件发生的URL', required: true })
-  @IsString()
-  @IsNotEmpty()
-  url: string;
+  url?: string;
 
   @ApiProperty({ description: '页面标题', required: false })
   @IsString()

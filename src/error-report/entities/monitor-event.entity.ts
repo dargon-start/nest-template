@@ -32,7 +32,7 @@ export class MonitorEvent {
   @Index('idx_session_id')
   session_id: string;
 
-  @Column({ length: 1000 })
+  @Column({ length: 1000, nullable: true })
   url: string;
 
   @Column({ length: 255, nullable: true })
